@@ -1,6 +1,16 @@
 # Changelog
 
 
+### [1.0.3](https://github.com/muhlba91/buildkite-plugin-kubernetes/compare/v1.0.2...v1.0.3) (2022-08-04)
+
+
+### Bug Fixes
+
+* fix chart deployment ([c04b248](https://github.com/muhlba91/buildkite-plugin-kubernetes/commit/c04b2485be88ab27e82d4a07d3d08ce0b1e19712))
+* fix chart env ([5f7da1f](https://github.com/muhlba91/buildkite-plugin-kubernetes/commit/5f7da1f8f6f5e1551026f0a52ee765ce61d48545))
+* fix chart labels ([d57d4a5](https://github.com/muhlba91/buildkite-plugin-kubernetes/commit/d57d4a535e4dcdb4e3cad97687b7778f02035a13))
+* fix entrypoint detection in plugin ([d591896](https://github.com/muhlba91/buildkite-plugin-kubernetes/commit/d591896d8fcbf0af9c3e4c092d8417bedfd5255e))
+
 ### [1.0.2](https://github.com/muhlba91/buildkite-plugin-kubernetes/compare/v1.0.1...v1.0.2) (2022-08-04)
 
 ### 1.0.1 (2022-08-04)
