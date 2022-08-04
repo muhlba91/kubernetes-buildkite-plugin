@@ -1,6 +1,13 @@
 # Changelog
 
 
+### [1.0.5](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/v1.0.4...v1.0.5) (2022-08-04)
+
+
+### Bug Fixes
+
+* fix job-name selector ([071c551](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/071c55145fd6e4c7b3caee451a310f42d9a0cbe2))
+
 ### [1.0.4](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/v1.0.3...v1.0.4) (2022-08-04)
 
 
