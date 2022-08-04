@@ -1,6 +1,8 @@
 # Changelog
 
 
+### [1.0.2](https://github.com/muhlba91/buildkite-plugin-kubernetes/compare/v1.0.1...v1.0.2) (2022-08-04)
+
 ### 1.0.1 (2022-08-04)
 
 
