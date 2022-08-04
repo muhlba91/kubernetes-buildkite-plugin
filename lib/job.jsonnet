@@ -121,7 +121,7 @@ function(jobName, agentEnv={}, stepEnvFile='', patchFunc=identity) patchFunc({
     'build/repo': labelValue(env.BUILDKITE_REPO),
     'build/branch': labelValue(env.BUILDKITE_BRANCH),
     'build/pipeline': labelValue(env.BUILDKITE_PIPELINE_SLUG),
-    'build/job-name': labelValue(jobName),
+    'job-name': labelValue(jobName),
     'buildkite/plugin': 'kubernetes',
   },
 
@@ -142,7 +142,7 @@ function(jobName, agentEnv={}, stepEnvFile='', patchFunc=identity) patchFunc({
     'buildkite/job-id': env.BUILDKITE_JOB_ID,
     'buildkite/step-id': env.BUILDKITE_STEP_ID,
     'buildkite/step-key': env.BUILDKITE_STEP_KEY,
-    'build/job-name': jobName,
+    'job-name': jobName,
   },
 
   local buildVolume =
