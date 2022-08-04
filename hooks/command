@@ -29,7 +29,7 @@ readonly log_loop_retry_interval_sec="${BUILDKITE_PLUGIN_KUBERNETES_LOG_RETRY_IN
 readonly log_attempt_timeout_sec="${BUILDKITE_PLUGIN_KUBERNETES_LOG_ATTEMPT_TIMEOUT_SEC:-5}"
 readonly job_status_retry_interval_sec="${BUILDKITE_PLUGIN_KUBERNETES_JOB_STATUS_RETRY_INTERVAL_SEC:-5}"
 readonly log_complete_retry_interval_sec="${BUILDKITE_PLUGIN_KUBERNETES_LOG_COMPLETE_RETRY_INTERVAL_SEC:-1}"
-readonly log_complete_timeout_sec="${BUILDKITE_PLUGIN_KUBERNETES_LOG_COMPLETE_TIMEOUT_SEC:-30}"
+readonly log_complete_timeout_sec="${BUILDKITE_PLUGIN_KUBERNETES_LOG_COMPLETE_TIMEOUT_SEC:-15}"
 readonly use_agent_node_affinity=${BUILDKITE_PLUGIN_KUBERNETES_USE_AGENT_NODE_AFFINITY:-false}
 readonly print_resulting_job_spec=${BUILDKITE_PLUGIN_KUBERNETES_PRINT_RESULTING_JOB_SPEC:-false}
 readonly jobs_cleanup_via_plugin=${BUILDKITE_PLUGIN_KUBERNETES_JOBS_CLEANUP_VIA_PLUGIN:-true}
@@ -212,7 +212,7 @@ else
     get_pod_status=$?
     if [[ "$get_pod_status" -eq 0 ]]; then
       init_container_status="$(echo "$pod_json" | jq ".status.initContainerStatuses[0].state.terminated.exitCode")"
-      if [[ -n "$init_container_status" && "$init_container_status" != "0" ]]; then
+      if [[ -n "$init_container_status" && "$init_container_status" != "0" && "$init_container_status" != "null" ]]; then
         echo "Warning: init container failed with exit code $init_container_status, this usually indicates plugin misconfiguration or infrastructure failure"
         status="$init_container_status"
       else

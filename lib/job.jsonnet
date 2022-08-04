@@ -346,31 +346,35 @@ function(jobName, agentEnv={}, stepEnvFile='', patchFunc=identity) patchFunc({
         },
       ],
 
-  local commandArgs =
-    if env.BUILDKITE_COMMAND != ''
-    then
-      {
-        command: [
-          '/bin/sh',
-          '-c',
-        ],
-        args: [
-          env.BUILDKITE_COMMAND,
-        ],
-      }
-    else
-      {
-        command: [
-          env[f]
-          for f in std.sort(std.objectFields(env), numberSuffix)
-          if std.startsWith(f, 'BUILDKITE_PLUGIN_KUBERNETES_ENTRYPOINT_')
-        ],
-        args: [
-          env[f]
-          for f in std.sort(std.objectFields(env), numberSuffix)
-          if std.startsWith(f, 'BUILDKITE_PLUGIN_KUBERNETES_COMMAND_')
-        ],
-      },
+  local entrypoint = [
+    env[f]
+    for f in std.sort(std.objectFields(env), numberSuffix)
+    if std.startsWith(f, 'BUILDKITE_PLUGIN_KUBERNETES_ENTRYPOINT_')
+  ],
+  local cmd = if std.length(entrypoint) == 0
+  then
+    [
+      '/bin/sh',
+      '-e',
+      '-c',
+    ]
+  else
+    entrypoint,
+  local args = if env.BUILDKITE_COMMAND != ''
+  then
+    [
+      env.BUILDKITE_COMMAND,
+    ]
+  else
+    [
+      env[f]
+      for f in std.sort(std.objectFields(env), numberSuffix)
+      if std.startsWith(f, 'BUILDKITE_PLUGIN_KUBERNETES_COMMAND_')
+    ],
+  local commandArgs = {
+    command: cmd,
+    args: args,
+  },
 
   local initContainers =
     if env.BUILDKITE_PLUGIN_KUBERNETES_INIT_IMAGE == ''

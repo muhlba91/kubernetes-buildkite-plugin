@@ -42,6 +42,10 @@ By default, the init image used is defined in this repositories `Dockerfile` and
 
 For your convenience, you can also use this image as yout Buildkite agent image as it's based on the official Buildkite image.
 
+### Versioning
+
+Please make sure to define a correct version of the plugin. Plugin releases are always tagged with `v*` (for example `v1.0.0`).
+
 ### Kubernetes Requirements
 
 To be able to create and manage the jobs in your cluster, make sure the `ServiceAccount` linked to your Buildkite agent deployment has sufficient RBAC permissions.
