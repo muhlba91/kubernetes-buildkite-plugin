@@ -1,0 +1,98 @@
+---
+name: Container
+description: Builds, and optionally Pushes a Container
+inputs:
+  container:
+    description: Container Name
+    required: true
+  token:
+    description: GitHub Token with contents write permissions
+    required: true
+  registryUsername:
+    description: Quay.io Registry Username
+    required: true
+  registryPassword:
+    description: Quay.io Registry Password
+    required: true
+outputs:
+  digest:
+    description: Container Image Digest
+    value: ${{ steps.image.outputs.digest }}
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Git
+      shell: bash
+      run: |
+        git config --local user.email "${{ github.action }}+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git fetch --tags
+        git pull || true
+
+    - name: Setup QEMU
+      uses: docker/setup-qemu-action@v2
+    - name: Setup Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    - name: Login to quay.io
+      uses: docker/login-action@v2
+      with:
+        registry: quay.io
+        username: ${{ inputs.registryUsername }}
+        password: ${{ inputs.registryPassword }}
+
+    - name: Define Versions
+      shell: bash
+      run: |
+        VERSION_FILE=`cat containers/BUILDKITE_AGENT_VERSION`
+        echo "BUILDKITE_AGENT_VERSION=${VERSION_FILE%%*( )}" >> $GITHUB_ENV
+        VERSION_FILE=`cat containers/KUBERNETES_VERSION`
+        echo "KUBERNETES_VERSION=${VERSION_FILE%%*( )}" >> $GITHUB_ENV
+
+    - name: Versioning and Changelog
+      if: github.ref == 'refs/heads/main'
+      working-directory: containers/${{ inputs.container }}
+      shell: bash
+      run: |
+        npx standard-version -i ../../release-CHANGELOG.md \
+          --path ../../containers/${{ inputs.container }}** \
+          --skip.commit \
+          --skip.tag \
+          --skip.bump
+        npx standard-version \
+          --path ../../containers/${{ inputs.container }}**
+
+        TAG_NAME=`git describe --abbrev=0 --match "container/${{ inputs.container }}/v*"`
+        echo "TAG_NAME=${TAG_NAME#"container/${{ inputs.container }}/v"}" >> $GITHUB_ENV
+
+    - name: Push Git Tag
+      if: github.ref == 'refs/heads/main'
+      shell: bash
+      run: |
+        git push --follow-tags origin ${{ github.ref_name }}
+
+    - name: Build and Push Image
+      id: image
+      uses: docker/build-push-action@v3
+      with:
+        context: containers/${{ inputs.container }}
+        platforms: linux/amd64
+        push: ${{ github.ref == 'refs/heads/main' }}
+        tags: |
+          quay.io/muhlba91/buildkite-${{ inputs.container }}:${{ env.BUILDKITE_AGENT_VERSION }}-${{ env.KUBERNETES_VERSION }}
+          quay.io/muhlba91/buildkite-${{ inputs.container }}:${{ env.BUILDKITE_AGENT_VERSION }}-${{ env.KUBERNETES_VERSION }}-${{ env.TAG_NAME }}
+          quay.io/muhlba91/buildkite-${{ inputs.container }}:${{ github.sha }}
+        build-args: |
+          BUILDKITE_AGENT_VERSION=${{ env.BUILDKITE_AGENT_VERSION }}
+          KUBERNETES_VERSION=${{ env.KUBERNETES_VERSION }}
+          CI_COMMIT_TIMESTAMP=${{ github.event.repository.updated_at }}
+          CI_COMMIT_SHA=${{ github.sha }}
+          CI_COMMIT_TAG=${{ env.TAG_NAME }}
+
+    - name: GitHub Release
+      if: github.ref == 'refs/heads/main'
+      uses: ncipollo/release-action@v1
+      with:
+        bodyFile: release-CHANGELOG.md
+        name: container/${{ inputs.container }}/v${{ env.TAG_NAME }}
+        tag: container/${{ inputs.container }}/v${{ env.TAG_NAME }}
+        token: ${{ inputs.token }}

@@ -1,0 +1,93 @@
+---
+name: Helm Release
+description: Releases a Helm Chart
+inputs:
+  chart:
+    description: Chart Name
+    required: true
+  token:
+    description: GitHub Token with contents write permissions
+    required: true
+  containerDigest:
+    description: Container Image Digest
+    required: false
+runs:
+  using: "composite"
+  steps:
+    - name: Setup Git
+      shell: bash
+      run: |
+        git config --local user.email "${{ github.action }}+github-actions[bot]@users.noreply.github.com"
+        git config --local user.name "github-actions[bot]"
+        git fetch --tags
+        git pull || true
+
+    - name: Setup Helm
+      if: steps.detect-change.outputs.changed == 'true'
+      uses: yokawasa/action-setup-kube-tools@v0.8.2
+      with:
+        setup-tools: |
+          helm
+    - name: Setup chart-releaser
+      uses: helm/chart-releaser-action@v1.4.0
+      with:
+        install_only: true
+      env:
+        CR_TOKEN: ${{ inputs.token }}
+
+    - name: Update Container Image
+      if: inputs.containerDigest != ''
+      working-directory: charts/${{ inputs.chart }}
+      shell: bash
+      run: |
+        sed -i "/appVersion: .*'/appVersion: \"@${{ inputs.containerDigest }}\"/g" Chart.yaml
+        git add Chart.yaml
+
+    - name: Versioning and Changelog
+      id: versioning
+      working-directory: charts/${{ inputs.chart }}
+      shell: bash
+      run: |
+        npx standard-version -i ../../release-CHANGELOG.md \
+          --path ../../charts/${{ inputs.chart }}** \
+          --skip.commit \
+          --skip.tag \
+          --skip.bump
+        npx standard-version \
+          --path ../../charts/${{ inputs.chart }}**
+
+        TAG_NAME=`git describe --abbrev=0 --match "chart/${{ inputs.chart }}/v*"`
+        echo ::set-output name=tagName::$(echo ${TAG_NAME#"chart/${{ inputs.chart }}/"})
+
+    - name: Push Git Tag
+      shell: bash
+      run: |
+        git push --follow-tags origin ${{ github.ref_name }}
+
+    - name: Create Helm Release
+      shell: bash
+      run: |
+        owner=$(cut -d '/' -f 1 <<< "${{ github.repository }}")
+        repo=$(cut -d '/' -f 2 <<< "${{ github.repository }}")
+
+        mkdir -p .cr-release-packages
+        mkdir -p .cr-index
+
+        cr package charts/${{ inputs.chart }} \
+          --package-path .cr-release-packages
+
+        cr upload \
+          --owner "${owner}" \
+          --git-repo "${repo}" \
+          --commit "$(git rev-parse HEAD)" \
+          --release-name-template "chart/{{ .Name }}/v{{ .Version }}" \
+          --release-notes-file release-CHANGELOG.md \
+          --package-path .cr-release-packages
+
+        cr index \
+          --owner "${owner}" \
+          --git-repo "${repo}" \
+          --release-name-template "chart/{{ .Name }}/v{{ .Version }}" \
+          --push
+      env:
+        CR_TOKEN: ${{ inputs.token }}

@@ -1,0 +1,84 @@
+---
+name: Container
+
+on:
+  pull_request:
+    paths:
+      - 'containers/**'
+  push:
+    branches:
+      - '*'
+    paths:
+      - 'containers/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+    strategy:
+      fail-fast: true
+      max-parallel: 4
+      matrix:
+        container:
+          - agent
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Detect Change
+        uses: dorny/paths-filter@v2
+        id: detect-change
+        with:
+          filters: |
+            changed:
+              - 'containers/${{ matrix.container }}/**'
+              - 'containers/BUILDKITE_AGENT_VERSION'
+              - 'containers/KUBERNETES_VERSION'
+
+      - name: Lint Dockerfile
+        uses: hadolint/hadolint-action@v2.0.0
+        with:
+          dockerfile: containers/${{ matrix.container }}/Dockerfile
+          config: containers/.hadolint.yml
+
+  container:
+    runs-on: ubuntu-latest
+    name: Build (and Push) Container Image
+    permissions:
+      contents: write
+    needs:
+      - lint
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix:
+        container:
+          - agent
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Detect Change
+        uses: dorny/paths-filter@v2
+        id: detect-change
+        with:
+          filters: |
+            changed:
+              - 'containers/${{ matrix.container }}/**'
+
+      - name: Build (and Push) ${{ matrix.container }}
+        id: image
+        if: steps.detect-change.outputs.changed == 'true'
+        uses: ./.github/actions/container
+        with:
+          container: ${{ matrix.container }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+          registryUsername: ${{ secrets.REGISTRY_USERNAME }}
+          registryPassword: ${{ secrets.REGISTRY_PASSWORD }}

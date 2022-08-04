@@ -1,0 +1,86 @@
+---
+name: kubernetes
+description: Runs Buildkite Steps as Kubernetes Jobs
+author: https://github.com/muhlba91
+requirements:
+  - jq
+  - jsonnet
+  - kubectl
+configuration:
+  properties:
+    image:
+      type: string
+    always-pull:
+      type: boolean
+    command:
+      type: array
+    entrypoint:
+      type: array
+    environment:
+      type: array
+    environment-from-secret:
+      type: [string, array]
+    init-environment-from-secret:
+      type: [string, array]
+    init-image:
+      type: string
+    mount-hostpath:
+      type: [string, array]
+    mount-secret:
+      type: [string, array]
+    privileged:
+      type: boolean
+    git-credentials-secret-name:
+      type: string
+    git-credentials-secret-key:
+      type: string
+    git-ssh-secret-name:
+      type: string
+    git-ssh-secret-key:
+      type: string
+    agent-token-secret-name:
+      type: string
+    agent-token-secret-key:
+      type: string
+    default-secret-name:
+      type: string
+    build-path-host-path:
+      type: string
+    build-path-pvc:
+      type: string
+    git-mirrors-host-path:
+      type: string
+    workdir:
+      type: string
+    patch:
+      type: string
+    resources-request-cpu:
+      type: string
+    resources-limit-cpu:
+      type: string
+    resources-request-memory:
+      type: string
+    resources-limit-memory:
+      type: string
+    service-account-name:
+      type: string
+    use-agent-node-affinity:
+      type: boolean
+    print-resulting-job-spec:
+      type: boolean
+      default: false
+    job-backoff-limit:
+      type: integer
+      default: 0
+    job-ttl-seconds-after-finished:
+      type: integer
+      default: 86400
+    jobs-cleanup-via-plugin:
+      type: boolean
+      default: true
+    job-cleanup-after-finished-via-plugin:
+      type: boolean
+      default: true
+  required:
+    - image
+  additionalProperties: false

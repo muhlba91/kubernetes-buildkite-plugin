@@ -1,0 +1,254 @@
+#!/bin/bash
+
+set -eo pipefail
+
+if [[ $OSTYPE == darwin* ]]; then
+  exec /bin/bash -c "$BUILDKITE_COMMAND"
+fi
+
+basedir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && cd .. && pwd )"
+
+# Ensure a name is a valid kubernetes resource name.
+function sanitize() {
+  echo "$@" | sed -E 's/[^A-Za-z0-9]/-/g' | sed -E 's/^[^a-zA-Z0-9]|[^a-zA-Z0-9]$//' | cut -c 1-63
+}
+
+job_name=$(sanitize "${BUILDKITE_PIPELINE_SLUG}-${BUILDKITE_BUILD_NUMBER}-$(head -c 5 /dev/urandom | base32 | tr '[:upper:]' '[:lower:]')")
+echo "${job_name}" > /tmp/job_name
+
+if [[ ${BUILDKITE_TIMEOUT:-"false"} == "false" ]]; then
+  BUILDKITE_TIMEOUT=600
+fi
+((timeout=BUILDKITE_TIMEOUT*60))
+export BUILDKITE_TIMEOUT
+
+# Default values can be overridden by setting "BUILDKITE_PLUGIN_KUBERNETES_*" env vars as used below.
+readonly job_apply_retry_interval_sec="${BUILDKITE_PLUGIN_KUBERNETES_JOB_APPLY_RETRY_INTERVAL_SEC:-5}"
+readonly job_apply_timeout_sec="${BUILDKITE_PLUGIN_KUBERNETES_JOB_APPLY_TIMEOUT_SEC:-120}"
+readonly log_loop_retry_interval_sec="${BUILDKITE_PLUGIN_KUBERNETES_LOG_RETRY_INTERVAL_SEC:-3}"
+readonly log_attempt_timeout_sec="${BUILDKITE_PLUGIN_KUBERNETES_LOG_ATTEMPT_TIMEOUT_SEC:-5}"
+readonly job_status_retry_interval_sec="${BUILDKITE_PLUGIN_KUBERNETES_JOB_STATUS_RETRY_INTERVAL_SEC:-5}"
+readonly log_complete_retry_interval_sec="${BUILDKITE_PLUGIN_KUBERNETES_LOG_COMPLETE_RETRY_INTERVAL_SEC:-1}"
+readonly log_complete_timeout_sec="${BUILDKITE_PLUGIN_KUBERNETES_LOG_COMPLETE_TIMEOUT_SEC:-30}"
+readonly use_agent_node_affinity=${BUILDKITE_PLUGIN_KUBERNETES_USE_AGENT_NODE_AFFINITY:-false}
+readonly print_resulting_job_spec=${BUILDKITE_PLUGIN_KUBERNETES_PRINT_RESULTING_JOB_SPEC:-false}
+readonly jobs_cleanup_via_plugin=${BUILDKITE_PLUGIN_KUBERNETES_JOBS_CLEANUP_VIA_PLUGIN:-true}
+
+bootstrap_container_log_complete_marker_file="$(mktemp)"
+readonly bootstrap_container_log_complete_marker_file
+step_container_log_complete_marker_file="$(mktemp)"
+readonly step_container_log_complete_marker_file
+
+function cleanup {
+  rm -f "$bootstrap_container_log_complete_marker_file" "$step_container_log_complete_marker_file"
+
+  if [[ "$jobs_cleanup_via_plugin" == "true" ]]; then
+    # Delete all jobs older than a day.
+    kubectl delete job "$(kubectl get job -l buildkite/plugin=kubernetes | awk 'match($4,/[0-9]+d/) {print $1}')" 2>/dev/null || true
+  fi
+}
+
+trap cleanup EXIT
+
+function tail_logs {
+  local -r pod_name="$1"
+  local -r container_name="$2"
+  local -r log_completion_marker_file="$3"
+
+  local log_snapshot=""
+  # Once logs are not empty we start attempting to stream them.
+  # Keep looping otherwise since empty output means that there is no useful log to display so we're not losing information by looping.
+  while true;
+  do
+    set +e
+    log_snapshot="$(timeout "$log_attempt_timeout_sec" kubectl logs --limit-bytes "1024" "pod/$pod_name" --container "$container_name" 2>/dev/null)"
+    set -e
+    if [[ -n "$log_snapshot" ]]; then
+      break
+    fi
+    sleep "$log_loop_retry_interval_sec"
+  done
+
+  # Run kubectl logs --follow in a loop since it can fail:
+  #   1) It can fail due to pod not being initialized yet: "Error from server (BadRequest): container "step" in pod "somepod" is waiting to start: PodInitializing"
+  #   2) It can fail mid-streaming, in this case we unfortunately will display logs multiple times (partially).
+  #   3) It can hang not providing any result, that's why we check not only exit code but also contents in the loop above.
+  while ! kubectl logs --follow "pod/$pod_name" --container "$container_name" 2>/dev/null;
+  do
+    sleep "$log_loop_retry_interval_sec"
+  done
+
+  echo "0" > "$log_completion_marker_file"
+}
+
+echo "--- :kubernetes: Starting Kubernetes Job"
+
+export patchFunc=${BUILDKITE_PLUGIN_KUBERNETES_PATCH:-"function(f) f"}
+
+job_spec="$(jsonnet \
+  --tla-str "jobName=${job_name}" \
+  --tla-str-file "stepEnvFile=${BUILDKITE_ENV_FILE}" \
+  --tla-code "agentEnv=$(jq -c -n env)" \
+  --tla-code patchFunc \
+  "${basedir}/lib/job.jsonnet")"
+
+if [[ "$use_agent_node_affinity" == "true" ]]; then
+  agent_spec="$(kubectl get pod "$(cat /etc/hostname)" -o json)"
+  for field in affinity tolerations nodeSelector; do
+    agent_value=$(echo "$agent_spec" | jq ".spec.$field")
+    job_spec="$(echo "$job_spec" | jq ".spec.template.spec.$field=$agent_value")"
+  done
+fi
+
+if [[ "$print_resulting_job_spec" == "true" ]]; then
+  echo -e "Resulting kubernetes job spec:\n$job_spec"
+fi
+
+readonly job_apply_start_time="$SECONDS"
+job_apply_exit_code=""
+
+while [[ "$((SECONDS - job_apply_start_time))" -lt "$job_apply_timeout_sec" ]]
+do
+  set +e
+  echo "$job_spec" | kubectl apply -f -
+  job_apply_exit_code="$?"
+  set -e
+
+  if [[ "$job_apply_exit_code" == "0" ]]; then
+    break
+  else
+    echo "Attempt to apply the job failed, exit code '$job_apply_exit_code'"
+    sleep "$job_apply_retry_interval_sec"
+  fi
+done
+
+if [[ "$job_apply_exit_code" != "0" ]]; then
+  echo "Failed to apply job, exit code '$job_apply_exit_code'"
+  exit "$job_apply_exit_code"
+fi
+
+echo "Timeout: ${timeout}s"
+
+echo "--- :kubernetes: Running image: ${BUILDKITE_PLUGIN_KUBERNETES_IMAGE}"
+
+counter="$timeout"
+while true
+do
+  exit_status=0
+  set +e
+  pod_name=$(kubectl get pod -l "build/job-name=$job_name" --output=jsonpath="{.items[*].metadata.name}" 2>&1)
+  exit_status=$?
+  set -e
+
+  if [[ $exit_status -ne 0 && "$pod_name" == *NotFound* ]]; then
+      set +e
+      jobstatus=$(kubectl get job "$job_name" -o 'jsonpath={.status.conditions[].type}')
+      set -e
+      if [[ "$jobstatus" == "Failed" ]]; then
+        echo "Warning: exiting because no pod was found and job status was Failed"
+        exit 42
+      fi
+  fi
+
+  if [[ -n "$pod_name" ]]; then
+    break
+  else
+    sleep "$job_status_retry_interval_sec"
+    if [[ $timeout -gt 0 ]]; then
+      (( counter -= job_status_retry_interval_sec )) || {
+        echo "Warning: timed out while creating pod"
+        exit 42
+      }
+    fi
+  fi
+done
+
+echo "Pod is running: $pod_name"
+
+if [[ -n "${BUILDKITE_PLUGIN_KUBERNETES_INIT_IMAGE}" ]]; then
+    echo "--- :kubernetes: bootstrap container"
+    tail_logs "$pod_name" "bootstrap" "$bootstrap_container_log_complete_marker_file"
+fi
+
+echo "+++ :kubernetes: step container"
+tail_logs "$pod_name" "step" "$step_container_log_complete_marker_file" &
+
+counter="$timeout"
+jobstatus=""
+while [[ -z "$jobstatus" ]] ; do
+  set +e
+  jobstatus=$(kubectl get job "${job_name}" -o 'jsonpath={.status.conditions[].type}')
+  set -e
+
+  if [[ -n "$jobstatus" ]]; then
+    break
+  else
+    sleep "$job_status_retry_interval_sec"
+  fi
+
+  if [[ $timeout -gt 0 ]]; then
+    (( counter -= job_status_retry_interval_sec )) || jobstatus="timed-out"
+  fi
+done
+
+echo "--- :kubernetes: Job status: $jobstatus"
+
+# Wait for logs to be fully printed, printing runs in a separate process and we're racing with it.
+readonly log_complete_start_time="$SECONDS"
+while [[ "$(cat "$step_container_log_complete_marker_file")" != "0" ]] && [[ "$((SECONDS - log_complete_start_time))" -lt "$log_complete_timeout_sec" ]]
+do
+  sleep "$log_complete_retry_interval_sec"
+done
+
+status=""
+if [[ "$jobstatus" == "Complete" ]] ; then
+  echo "success"
+  status="0"
+else
+  while true
+  do
+    set +e
+    pod_json=$(kubectl get pod "$pod_name" -o json 2>&1)
+    get_pod_status=$?
+    if [[ "$get_pod_status" -eq 0 ]]; then
+      init_container_status="$(echo "$pod_json" | jq ".status.initContainerStatuses[0].state.terminated.exitCode")"
+      if [[ -n "$init_container_status" && "$init_container_status" != "0" ]]; then
+        echo "Warning: init container failed with exit code $init_container_status, this usually indicates plugin misconfiguration or infrastructure failure"
+        status="$init_container_status"
+      else
+        if container_status="$(echo "$pod_json" | jq -e ".status.containerStatuses[0].state.terminated.exitCode")"; then
+          status=$container_status
+        fi
+      fi
+    elif [[ "$pod_json" == *NotFound* ]]; then
+      echo "Warning: pod not found"
+      status="42"
+    else
+      echo "$pod_json" >&2
+
+      if container_status="$(echo "$pod_json" | jq -e ".status.containerStatuses[0].state.terminated.exitCode")"; then
+        status=$container_status
+      fi
+    fi
+    set -e
+
+    if [[ -n "$status" ]]; then
+      break
+    else
+      sleep "$job_status_retry_interval_sec"
+      if [[ $timeout -gt 0 ]]; then
+        (( counter -= job_status_retry_interval_sec )) || {
+          echo "Warning: timed out while checking init container status"
+          break
+        }
+      fi
+    fi
+  done
+fi
+
+if [[ -z "$status" ]]; then
+  echo "Warning: could not get actual exit code of the job"
+  status="42"
+fi
+
+exit "$status"

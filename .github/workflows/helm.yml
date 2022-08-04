@@ -1,0 +1,89 @@
+---
+name: Helm
+
+on:
+  pull_request:
+    paths:
+      - 'charts/**'
+  push:
+    branches:
+      - '*'
+    paths:
+      - 'charts/**'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint Charts
+    strategy:
+      fail-fast: true
+      max-parallel: 4
+      matrix:
+        chart:
+          - agent
+          - buildscaler
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Detect Change
+        uses: dorny/paths-filter@v2
+        id: detect-change
+        with:
+          filters: |
+            changed:
+              - 'charts/${{ matrix.chart }}/**'
+
+      - name: Setup Helm
+        if: steps.detect-change.outputs.changed == 'true'
+        uses: yokawasa/action-setup-kube-tools@v0.8.2
+        with:
+          setup-tools: |
+            helm
+
+      - name: Lint ${{ matrix.chart }}
+        working-directory: charts
+        if: steps.detect-change.outputs.changed == 'true'
+        run: |
+          helm lint ${{ matrix.chart }}
+
+  release:
+    runs-on: ubuntu-latest
+    name: Release Charts
+    permissions:
+      contents: write
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - lint
+    strategy:
+      fail-fast: true
+      max-parallel: 1
+      matrix:
+        chart:
+          - agent
+          - buildscaler
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Detect Change
+        uses: dorny/paths-filter@v2
+        id: detect-change
+        with:
+          filters: |
+            changed:
+              - 'charts/${{ matrix.chart }}/**'
+
+      - name: Release ${{ matrix.chart }}
+        if: steps.detect-change.outputs.changed == 'true'
+        uses: ./.github/actions/helm-release
+        with:
+          chart: ${{ matrix.chart }}
+          token: ${{ secrets.GITHUB_TOKEN }}

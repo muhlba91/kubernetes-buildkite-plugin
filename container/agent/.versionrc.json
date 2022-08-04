@@ -1,0 +1,7 @@
+{
+  "releaseCommitMessageFormat": "chore(release): release agent container {{currentTag}} [skip ci] [container] [release]",
+  "tagPrefix": "container/agent/v",
+  "bumpFiles": [],
+  "packageFiles": [],
+  "header": "# Changelog\n\n"
+}
