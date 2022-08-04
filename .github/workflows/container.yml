@@ -103,3 +103,10 @@ jobs:
           chart: ${{ matrix.container }}
           containerDigest: ${{ steps.image.outputs.containerDigest }}
           token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release Plugin
+        if: github.ref == 'refs/heads/main' && steps.detect-change.outputs.changed == 'true' && ${{ matrix.container }} == 'agent'
+        uses: ./.github/actions/plugin-release
+        with:
+          containerDigest: ${{ steps.image.outputs.containerDigest }}
+          token: ${{ secrets.GITHUB_TOKEN }}

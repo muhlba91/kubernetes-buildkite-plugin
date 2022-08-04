@@ -1,0 +1,11 @@
+---
+name: Plugin Lint
+description: Lints the Buildkite Plugin
+runs:
+  using: "docker"
+  image: "buildkite/plugin-linter"
+  args:
+    - --path
+    - /github/workspace
+    - --id
+    - muhlba91/kubernetes

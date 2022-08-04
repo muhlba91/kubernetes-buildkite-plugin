@@ -1,0 +1,56 @@
+---
+name: Buildkite Plugin
+
+on:
+  pull_request:
+    paths:
+      - 'hooks/**'
+      - 'lib/**'
+      - 'plugin.yml'
+  push:
+    branches:
+      - '*'
+    paths:
+      - 'hooks/**'
+      - 'lib/**'
+      - 'plugin.yml'
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    name: Lint
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Check Hooks
+        uses: ludeeus/action-shellcheck@master
+        with:
+          scandir: './hooks'
+    
+      - name: Lint Plugin
+        uses: ./.github/actions/plugin-lint
+        with:
+          scandir: './hooks'
+    
+  release:
+    runs-on: ubuntu-latest
+    name: Release
+    if: github.ref == 'refs/heads/main'
+    needs:
+      - lint
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Release Plugin
+        uses: ./.github/actions/plugin-release
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}

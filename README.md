@@ -84,7 +84,7 @@ helm install buildkite-agent-kubernetes buildkite-agent-kubernetes/buildscaler -
 steps:
   - command: "echo 'Hello, World!'"
     plugins:
-      - muhlba91/kubernetes:
+      - muhlba91/kubernetes#v0.0.0:
           image: alpine
 ```
 
@@ -93,7 +93,7 @@ If you want to control how your command is passed to the container, you can use 
 ```yaml
 steps:
   - plugins:
-      - muhlna91/kubernetes:
+      - muhlba91/kubernetes#v0.0.0:
           image: alpine
           always-pull: true
           command: ["echo", "command"]
@@ -107,7 +107,7 @@ steps:
       - "yarn install"
       - "yarn run test"
     plugins:
-      - muhlba91/kubernetes:
+      - muhlba91/kubernetes#v0.0.0:
           image: "node:16"
           environment:
             - "PUBLIC_ENVIRONMENT_VARIABLE=value"
