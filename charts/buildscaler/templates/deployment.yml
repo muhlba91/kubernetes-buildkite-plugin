@@ -46,8 +46,8 @@ spec:
                 secretKeyRef:
                   name: {{- default "buildkite-agent-token" .Values.agentToken.existingSecretName }}
                   key: {{- default "buildkite-agent-token" .Values.agentToken.existingSecretKey }}
-            {{- if .Values.extraEnv }}
-              {{- toYaml .Values.extraEnv | nindent 12 }}
+            {{- with .Values.extraEnv }}
+              {{- toYaml . | nindent 12 }}
             {{- end }}
           volumeMounts:
             - name: tmp-vol

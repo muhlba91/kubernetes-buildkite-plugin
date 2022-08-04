@@ -23,8 +23,9 @@ agentToken:
   # existingSecretName: buildkite-secrets
   # existingSecretKey: buildkite-agent-token
 
-extraEnv: {}
-  # ENV_VARIABLE: value
+extraEnv: []
+  # - name: VARIABLE
+  #   value: value
 
 podAnnotations: {}
 

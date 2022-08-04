@@ -35,8 +35,9 @@ gitAuth:
     # existingSecretName: buildkite-secrets
     # existingSecretKey: ssh-key
 
-extraEnv: {}
-  # ENV_VARIABLE: value
+extraEnv: []
+  # - name: VARIABLE
+  #   value: value
 
 podAnnotations: {}
 
