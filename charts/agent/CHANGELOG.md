@@ -1,6 +1,13 @@
 # Changelog
 
 
+### [1.0.4](https://github.com/muhlba91/buildkite-plugin-kubernetes/compare/chart/agent/v1.0.3...chart/agent/v1.0.4) (2022-08-04)
+
+
+### Bug Fixes
+
+* fix chart deployment ([c04b248](https://github.com/muhlba91/buildkite-plugin-kubernetes/commit/c04b2485be88ab27e82d4a07d3d08ce0b1e19712))
+
 ### [1.0.3](https://github.com/muhlba91/buildkite-plugin-kubernetes/compare/chart/agent/v1.0.2...chart/agent/v1.0.3) (2022-08-04)
 
 
