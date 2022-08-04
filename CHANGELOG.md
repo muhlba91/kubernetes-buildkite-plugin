@@ -1,6 +1,13 @@
 # Changelog
 
 
+### [1.0.4](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/v1.0.3...v1.0.4) (2022-08-04)
+
+
+### Bug Fixes
+
+* fix command hook and labels ([7d64680](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/7d646803a0d8e6f6d885b03d51c872a332e76546))
+
 ### [1.0.3](https://github.com/muhlba91/buildkite-plugin-kubernetes/compare/v1.0.2...v1.0.3) (2022-08-04)
 
 
