@@ -69,6 +69,12 @@ function(jobName, agentEnv={}, stepEnvFile='', patchFunc=identity) patchFunc({
     ] +
     [
       {
+        name: 'BUILDKITE_BOOTSTRAP_PHASES',
+        value: 'checkout,command',
+      },
+    ] +
+    [
+      {
         name: 'BUILDKITE_AGENT_TOKEN',
         valueFrom: {
           secretKeyRef: {
@@ -115,6 +121,7 @@ function(jobName, agentEnv={}, stepEnvFile='', patchFunc=identity) patchFunc({
     'build/repo': labelValue(env.BUILDKITE_REPO),
     'build/branch': labelValue(env.BUILDKITE_BRANCH),
     'build/pipeline': labelValue(env.BUILDKITE_PIPELINE_SLUG),
+    'build/job-name': labelValue(jobName),
     'buildkite/plugin': 'kubernetes',
   },
 

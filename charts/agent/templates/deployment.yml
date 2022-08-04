@@ -37,6 +37,8 @@ spec:
           resources:
             {{- toYaml .Values.resources | nindent 12 }}
           env:
+            - name: BUILDKITE_PLUGIN_KUBERNETES_SERVICE_ACCOUNT_NAME
+              value: {{ include "agent.serviceAccountName" . }}
             - name: BUILDKITE_AGENT_TOKEN
               valueFrom:
                 secretKeyRef:

@@ -105,13 +105,13 @@ if [[ "$print_resulting_job_spec" == "true" ]]; then
 fi
 
 readonly job_apply_start_time="$SECONDS"
-job_apply_exit_code=""
+job_apply_exit_code=0
 
 while [[ "$((SECONDS - job_apply_start_time))" -lt "$job_apply_timeout_sec" ]]
 do
   set +e
   echo "$job_spec" | kubectl apply -f -
-  job_apply_exit_code="$?"
+  job_apply_exit_code=$?
   set -e
 
   if [[ "$job_apply_exit_code" == "0" ]]; then
@@ -124,7 +124,7 @@ done
 
 if [[ "$job_apply_exit_code" != "0" ]]; then
   echo "Failed to apply job, exit code '$job_apply_exit_code'"
-  exit "$job_apply_exit_code"
+  exit $job_apply_exit_code
 fi
 
 echo "Timeout: ${timeout}s"
