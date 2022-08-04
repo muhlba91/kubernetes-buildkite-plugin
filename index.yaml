@@ -64,6 +64,26 @@ entries:
   buildscaler:
   - apiVersion: v2
     appVersion: v2.2.0
+    created: "2022-08-04T11:27:42.556072487Z"
+    description: Buildscaler for a Buildkite Kubernetes Agent
+    digest: 5d1ab7f2f79d9bed33f336bc1074784763886cf857d75cc36228608544b761d7
+    home: https://github.com/muhlba91/buildkite-plugin-kubernetes
+    keywords:
+    - buildkite
+    - buildscaler
+    - kubernetes
+    maintainers:
+    - email: daniel.muehlbachler@niftyside.io
+      name: Daniel Muehlbachler-Pietrzykowski
+    name: buildscaler
+    sources:
+    - https://github.com/muhlba91/buildkite-plugin-kubernetes
+    type: application
+    urls:
+    - https://github.com/muhlba91/buildkite-plugin-kubernetes/releases/download/chart/buildscaler/v1.0.2/buildscaler-1.0.2.tgz
+    version: 1.0.2
+  - apiVersion: v2
+    appVersion: v2.2.0
     created: "2022-08-04T10:16:42.085967035Z"
     description: Buildscaler for a Buildkite Kubernetes Agent
     digest: dbf6bfcec4a58338d8800f1484ab32afb93e3f8e70fdd6e4accc7ef83afcc7f6
@@ -82,4 +102,4 @@ entries:
     urls:
     - https://github.com/muhlba91/buildkite-plugin-kubernetes/releases/download/chart/buildscaler/v1.0.1/buildscaler-1.0.1.tgz
     version: 1.0.1
-generated: "2022-08-04T11:27:18.873264155Z"
+generated: "2022-08-04T11:27:42.556089788Z"
