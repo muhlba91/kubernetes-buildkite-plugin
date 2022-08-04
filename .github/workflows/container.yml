@@ -82,3 +82,24 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           registryUsername: ${{ secrets.REGISTRY_USERNAME }}
           registryPassword: ${{ secrets.REGISTRY_PASSWORD }}
+
+      - name: Check if a Chart Exists
+        id: check-chart
+        if: github.ref == 'refs/heads/main' && steps.detect-change.outputs.changed == 'true'
+        working-directory: charts
+        shell: bash
+        run: |
+          RELEASE_CHART="false"
+          if [ -d "${{ matrix.container }}" ]; then
+            echo "Marking chart ${{ matrix.container }} for release."
+            RELEASE_CHART="true"
+          fi
+          echo ::set-output name=exists::$(echo $RELEASE_CHART)
+
+      - name: Release Helm Chart ${{ matrix.container }}
+        if: github.ref == 'refs/heads/main' && steps.detect-change.outputs.changed == 'true' && steps.check-chart.outputs.exists == 'true'
+        uses: ./.github/actions/helm-release
+        with:
+          chart: ${{ matrix.container }}
+          containerDigest: ${{ steps.image.outputs.containerDigest }}
+          token: ${{ secrets.GITHUB_TOKEN }}

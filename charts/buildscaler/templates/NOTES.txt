@@ -1,0 +1,4 @@
+The Buildscaler for Buildkite with Kubernetes Support in version {{ .Chart.AppVersion }} has been deployed successfully!
+
+Useful commands to check the resources:
+kubectl --namespace {{ .Release.Namespace }} get pod

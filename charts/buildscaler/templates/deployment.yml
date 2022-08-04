@@ -1,0 +1,69 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "buildscaler.fullname" . }}
+  labels:
+    {{- include "buildscaler.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "buildscaler.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      {{- with .Values.podAnnotations }}
+      annotations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      labels:
+        {{- include "buildscaler.selectorLabels" . | nindent 8 }}
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      serviceAccountName: {{ include "buildscaler.serviceAccountName" . }}
+      securityContext:
+        {{- toYaml .Values.podSecurityContext | nindent 8 }}
+      containers:
+        - name: {{ .Chart.Name }}
+          securityContext:
+            {{- toYaml .Values.securityContext | nindent 12 }}
+          image: "{{ .Values.image.repository }}{{- if not (hasPrefix "@" (.Values.image.tag | default .Chart.AppVersion)) -}}:{{- end -}}{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+          args:
+            - /buildscaler
+            - --secure-port=6443
+            - --logtostderr=true
+            - --v=6
+            - --ci-platform=buildkite
+          env:
+            - name: BUILDKITE_AGENT_TOKEN
+              valueFrom:
+                secretKeyRef:
+                  name: {{- default "buildkite-agent-token" .Values.agentToken.existingSecretName }}
+                  key: {{- default "buildkite-agent-token" .Values.agentToken.existingSecretKey }}
+            {{- if .Values.extraEnv }}
+              {{- toYaml .Values.extraEnv | nindent 12 }}
+            {{- end }}
+          volumeMounts:
+            - name: tmp-vol
+              mountPath: /tmp  
+      volumes:
+        - name: tmp-vol
+          emptyDir: {}
+      {{- with .Values.nodeSelector }}
+      nodeSelector:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.affinity }}
+      affinity:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      {{- with .Values.tolerations }}
+      tolerations:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}

@@ -1,0 +1,22 @@
+---
+apiVersion: v2
+
+name: buildscaler
+description: Buildscaler for a Buildkite Kubernetes Agent
+type: application
+
+home: https://github.com/muhlba91/buildkite-plugin-kubernetes
+sources:
+  - https://github.com/muhlba91/buildkite-plugin-kubernetes
+keywords:
+  - buildkite
+  - buildscaler
+  - kubernetes
+
+maintainers:
+  - name: Daniel Muehlbachler-Pietrzykowski
+    email: daniel.muehlbachler@niftyside.io
+
+appVersion: v2.2.0
+# NOTE: this value is updated by the release process
+version: 1.1.1

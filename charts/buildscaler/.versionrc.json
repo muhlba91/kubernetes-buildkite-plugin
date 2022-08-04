@@ -1,0 +1,12 @@
+{
+  "releaseCommitMessageFormat": "chore(release): release buildscaler chart {{currentTag}} [skip ci] [chart] [release]",
+  "tagPrefix": "chart/buildscaler/v",
+  "bumpFiles": [
+    {
+      "filename": "Chart.yaml",
+      "updater": "../../.github/workflows/scripts/helm-version-updater.js"
+    }
+  ],
+  "packageFiles": [],
+  "header": "# Changelog\n\n"
+}

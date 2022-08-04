@@ -5,7 +5,7 @@
 [![](https://img.shields.io/github/workflow/status/muhlba91/buildkite-plugin-kubernetes/Container?style=for-the-badge)](https://github.com/muhlba91/buildkite-plugin-kubernetes/actions)
 [![](https://img.shields.io/github/workflow/status/muhlba91/buildkite-plugin-kubernetes/Helm?style=for-the-badge)](https://github.com/muhlba91/buildkite-plugin-kubernetes/actions)
 [![](https://img.shields.io/github/release-date/muhlba91/buildkite-plugin-kubernetes?style=for-the-badge)](https://github.com/muhlba91/buildkite-plugin-kubernetes/releases)
-[![](https://quay.io/repository/muhlba91/buildkite-agent-kubernetes/status)](https://quay.io/repository/muhlba91/buildkite-agent-kubernetes)
+[![](https://quay.io/repository/muhlba91/buildkite-agent/status)](https://quay.io/repository/muhlba91/buildkite-agent)
 [![](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/buildkite-plugin-kubernetes)](https://artifacthub.io/packages/search?repo=buildkite-plugin-kubernetes)
 <a href="https://www.buymeacoffee.com/muhlba91" target="_blank"><img src="https://cdn.buymeacoffee.com/buttons/default-orange.png" alt="Buy Me A Coffee" height="28" width="150"></a>
 
@@ -38,7 +38,7 @@ A workaround to this is to run `buildkite-agent artifact upload ...` as a comman
 
 The plugin requires `jsonnet`, `jq`, and `kubectl` to be installed in the Buildkite agent (and the init) image used.
 
-By default, the init image used is defined in this repositories `Dockerfile` and published as `quay.io/muhlba91/buildkite-agent-kubernetes:<TAG>`.
+By default, the init image used is defined in this repositories `Dockerfile` and published as `quay.io/muhlba91/buildkite-agent:<TAG>`.
 
 For your convenience, you can also use this image as yout Buildkite agent image as it's based on the official Buildkite image.
 
@@ -46,7 +46,7 @@ For your convenience, you can also use this image as yout Buildkite agent image 
 
 To be able to create and manage the jobs in your cluster, make sure the `ServiceAccount` linked to your Buildkite agent deployment has sufficient RBAC permissions.
 
-Please refer to [`charts/buildkite-agent-kubernetes/templates/rbac.yml`](charts/agent/templates/rbac.yml) for the RBAC permissions required.
+Please refer to [`charts/agent/templates/rbac.yml`](charts/agent/templates/rbac.yml) for the RBAC permissions required.
 
 ### Helm Charts
 
@@ -175,7 +175,7 @@ Example: `my-secrets`
 
 Override the [job initContainer](https://kubernetes.io/docs/concepts/workloads/pods/init-containers/). A buildkite-agent binary is expected to exist to do the checkout, along with git and ssh. The default is to use a public image based on the Dockerfile in this repository. If set to an empty string no init container is used.
 
-Example: `quay.io/muhlba91/buildkite-agent-kubernetes:<VERSION>`
+Example: `quay.io/muhlba91/buildkite-agent:<VERSION>`
 
 ### `privileged` (optional, boolean)
 
