@@ -48,6 +48,6 @@ runs:
       uses: ncipollo/release-action@v1
       with:
         bodyFile: release-CHANGELOG.md
-        name: ${{ env.TAG_NAME }}
-        tag: ${{ env.TAG_NAME }}
+        name: ${{ steps.versioning.outputs.tagName }}
+        tag: ${{ steps.versioning.outputs.tagName }}
         token: ${{ inputs.token }}

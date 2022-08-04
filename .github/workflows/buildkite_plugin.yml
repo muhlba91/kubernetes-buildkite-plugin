@@ -33,8 +33,6 @@ jobs:
     
       - name: Lint Plugin
         uses: ./.github/actions/plugin-lint
-        with:
-          scandir: './hooks'
     
   release:
     runs-on: ubuntu-latest
