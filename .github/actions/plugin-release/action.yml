@@ -21,6 +21,7 @@ runs:
 
     - name: Update Container Image
       if: inputs.containerDigest != ''
+      shell: bash
       run: |
         sed -i "s/'quay.io\/muhlba91\/buildkite-agent.*'/'quay.io\/muhlba91\/buildkite-agent@${{ inputs.containerDigest }}'/g" lib/job.jsonnet
         git add lib/job.jsonnet

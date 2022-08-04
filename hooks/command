@@ -81,7 +81,7 @@ function tail_logs {
   echo "0" > "$log_completion_marker_file"
 }
 
-echo "--- :kubernetes: Starting Kubernetes Job"
+echo "--- :kubernetes: Starting Kubernetes Job (${job_name})"
 
 export patchFunc=${BUILDKITE_PLUGIN_KUBERNETES_PATCH:-"function(f) f"}
 
