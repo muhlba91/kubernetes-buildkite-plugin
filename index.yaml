@@ -1,0 +1,24 @@
+apiVersion: v1
+entries:
+  agent:
+  - apiVersion: v2
+    appVersion: '@sha256:d0e2d2ecc3b3754a1d8645d584bb37a14c259ac4f809a05088c82d8fba1de2bf'
+    created: "2022-08-04T10:16:18.478835533Z"
+    description: Buildkite Agent with Kubernetes Support
+    digest: 1e4e690f2f7910fd8118fdae1ed95ec38ffe4d5318df3b57d374cb9d19c7e3a6
+    home: https://github.com/muhlba91/buildkite-plugin-kubernetes
+    keywords:
+    - buildkite
+    - buildkite-agent
+    - kubernetes
+    maintainers:
+    - email: daniel.muehlbachler@niftyside.io
+      name: Daniel Muehlbachler-Pietrzykowski
+    name: agent
+    sources:
+    - https://github.com/muhlba91/buildkite-plugin-kubernetes
+    type: application
+    urls:
+    - https://github.com/muhlba91/buildkite-plugin-kubernetes/releases/download/chart/agent/v1.0.1/agent-1.0.1.tgz
+    version: 1.0.1
+generated: "2022-08-04T10:16:18.478840833Z"
