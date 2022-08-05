@@ -1,6 +1,13 @@
 # Changelog
 
 
+### [1.0.5](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/chart/buildscaler/v1.0.4...chart/buildscaler/v1.0.5) (2022-08-05)
+
+
+### Bug Fixes
+
+* fix buildscaler duplicated rbac rolebinding ([ca404ee](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/ca404ee29eb75202a5c23a24e891f9b8b72f731e))
+
 ### [1.0.4](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/chart/buildscaler/v1.0.3...chart/buildscaler/v1.0.4) (2022-08-05)
 
 
