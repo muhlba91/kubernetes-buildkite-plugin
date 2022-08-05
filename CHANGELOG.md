@@ -1,6 +1,14 @@
 # Changelog
 
 
+### [1.0.7](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/v1.0.6...v1.0.7) (2022-08-05)
+
+
+### Bug Fixes
+
+* fix job-name label ([448dd35](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/448dd3501a003c5e7a1cd04039d2adcc59b71581))
+* reduce ttl for job and set plugin cleanup to false ([2b8effe](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/2b8effe789eef6a6c1e7e1a289f83ba67ecb991d))
+
 ### [1.0.6](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/v1.0.5...v1.0.6) (2022-08-05)
 
 
