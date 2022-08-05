@@ -1,6 +1,13 @@
 # Changelog
 
 
+### [1.0.9](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/chart/agent/v1.0.8...chart/agent/v1.0.9) (2022-08-05)
+
+
+### Bug Fixes
+
+* add additional volumes to agent chart ([15536f9](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/15536f900f8a925a72618adad4c1903e0def10e4))
+
 ### [1.0.8](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/chart/agent/v1.0.7...chart/agent/v1.0.8) (2022-08-05)
 
 
