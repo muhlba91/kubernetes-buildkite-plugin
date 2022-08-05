@@ -72,22 +72,24 @@ spec:
       volumes:
       {{- if or .Values.gitAuth.credentials.enabled .Values.gitAuth.ssh.enabled }}
         - name: git-auth
-          defaultMode: 256
           projected:
-            {{- if .Values.gitAuth.credentials.enabled }}
-            - secret:
-                name: {{ default "git-auth-credentials" .Values.gitAuth.credentials.existingSecretName }}
-                items:
-                  - key: {{ default "git-credentials" .Values.gitAuth.credentials.existingSecretKey }}
-                    path: git-credentials
-            {{- end }}
-            {{- if .Values.gitAuth.ssh.enabled }}
-            - secret:
-                name: {{ default "git-auth-ssh" .Values.gitAuth.ssh.existingSecretName }}
-                items:
-                  - key: {{ default "ssh-key" .Values.gitAuth.ssh.existingSecretKey }}
-                    path: ssh-key
-            {{- end }}
+            sources:
+              {{- if .Values.gitAuth.credentials.enabled }}
+              - secret:
+                  name: {{ default "git-auth-credentials" .Values.gitAuth.credentials.existingSecretName }}
+                  items:
+                    - key: {{ default "git-credentials" .Values.gitAuth.credentials.existingSecretKey }}
+                      path: git-credentials
+                  mode: 256
+              {{- end }}
+              {{- if .Values.gitAuth.ssh.enabled }}
+              - secret:
+                  name: {{ default "git-auth-ssh" .Values.gitAuth.ssh.existingSecretName }}
+                  items:
+                    - key: {{ default "ssh-key" .Values.gitAuth.ssh.existingSecretKey }}
+                      path: ssh-key
+                  mode: 256
+              {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
