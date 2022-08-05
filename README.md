@@ -315,16 +315,19 @@ If set to `true`, the resulting k8s job spec is printed to the log. This can be 
 ### `job-backoff-limit` (optional, integer)
 
 Configures [`spec.backoffLimit`](https://kubernetes.io/docs/concepts/workloads/controllers/job/#pod-backoff-failure-policy) to enable retries of job's pod creation.
+
 Default value: `0`.
 
 ### `job-ttl-seconds-after-finished` (optional, integer)
 
 Configures [`spec.ttlSecondsAfterFinished`](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/) on the k8s job, requires TTL Controller enabled in the cluster, otherwise ignored.
-Default value: `86400`.
+
+Default value: `3600`.
 
 ### `jobs-cleanup-via-plugin` (optional, boolean)
 
 If set to `true`, the plugin cleans up k8s jobs older than 1 day even if they're still running.
+
 Default value: `true`.
 
 If you have [TTL Controller](https://kubernetes.io/docs/concepts/workloads/controllers/ttlafterfinished/) enabled or some other means to cleanup finished jobs, it is recommended to set the value to `false` in order to reduce load on k8s api servers.
@@ -332,6 +335,7 @@ If you have [TTL Controller](https://kubernetes.io/docs/concepts/workloads/contr
 ### `job-cleanup-after-finished-via-plugin` (optional, boolean)
 
 If set to `true` plugin cleans up finished k8s job.
+
 Default value: `true`.
 
 If you have TTL controller or https://github.com/lwolf/kube-cleanup-operator running, it is highly recommended to set the value to `false` to reduce load on k8s api servers.

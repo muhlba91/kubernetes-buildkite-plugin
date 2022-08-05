@@ -32,7 +32,7 @@ readonly log_complete_retry_interval_sec="${BUILDKITE_PLUGIN_KUBERNETES_LOG_COMP
 readonly log_complete_timeout_sec="${BUILDKITE_PLUGIN_KUBERNETES_LOG_COMPLETE_TIMEOUT_SEC:-15}"
 readonly use_agent_node_affinity=${BUILDKITE_PLUGIN_KUBERNETES_USE_AGENT_NODE_AFFINITY:-false}
 readonly print_resulting_job_spec=${BUILDKITE_PLUGIN_KUBERNETES_PRINT_RESULTING_JOB_SPEC:-false}
-readonly jobs_cleanup_via_plugin=${BUILDKITE_PLUGIN_KUBERNETES_JOBS_CLEANUP_VIA_PLUGIN:-true}
+readonly jobs_cleanup_via_plugin=${BUILDKITE_PLUGIN_KUBERNETES_JOBS_CLEANUP_VIA_PLUGIN:-false}
 
 bootstrap_container_log_complete_marker_file="$(mktemp)"
 readonly bootstrap_container_log_complete_marker_file
