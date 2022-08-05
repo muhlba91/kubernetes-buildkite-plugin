@@ -44,8 +44,8 @@ spec:
             - name: BUILDKITE_AGENT_TOKEN
               valueFrom:
                 secretKeyRef:
-                  name: {{- default "buildkite-agent-token" .Values.agentToken.existingSecretName }}
-                  key: {{- default "buildkite-agent-token" .Values.agentToken.existingSecretKey }}
+                  name: {{ default "buildkite-agent-token" .Values.agentToken.existingSecretName }}
+                  key: {{ default "buildkite-agent-token" .Values.agentToken.existingSecretKey }}
             {{- with .Values.extraEnv }}
               {{- toYaml . | nindent 12 }}
             {{- end }}
