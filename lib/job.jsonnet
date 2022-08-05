@@ -121,7 +121,7 @@ function(jobName, agentEnv={}, stepEnvFile='', patchFunc=identity) patchFunc({
     'build/repo': labelValue(env.BUILDKITE_REPO),
     'build/branch': labelValue(env.BUILDKITE_BRANCH),
     'build/pipeline': labelValue(env.BUILDKITE_PIPELINE_SLUG),
-    'job-name': labelValue(jobName),
+    'job-name': jobName,
     'buildkite/plugin': 'kubernetes',
   },
 
