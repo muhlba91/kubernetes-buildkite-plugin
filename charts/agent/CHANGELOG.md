@@ -1,6 +1,14 @@
 # Changelog
 
 
+### [1.0.5](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/chart/agent/v1.0.4...chart/agent/v1.0.5) (2022-08-05)
+
+
+### Bug Fixes
+
+* fix command hook and labels ([7d64680](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/7d646803a0d8e6f6d885b03d51c872a332e76546))
+* update chart app version ([a9e10e1](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/a9e10e1687e17f87509a319eacef6b4f785217ca))
+
 ### [1.0.4](https://github.com/muhlba91/buildkite-plugin-kubernetes/compare/chart/agent/v1.0.3...chart/agent/v1.0.4) (2022-08-04)
 
 
