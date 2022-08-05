@@ -63,12 +63,18 @@ spec:
           {{- with .Values.extraEnv }}
             {{- toYaml . | nindent 12 }}
           {{- end }}
-          {{- if or .Values.gitAuth.credentials.enabled .Values.gitAuth.ssh.enabled }}
+          {{- if or .Values.gitAuth.credentials.enabled .Values.gitAuth.ssh.enabled .Values.additionalVolumeMounts }}
           volumeMounts:
+          {{- if or .Values.gitAuth.credentials.enabled .Values.gitAuth.ssh.enabled }}
             - name: git-auth
               mountPath: /secrets
               readOnly: true
           {{- end }}
+          {{- if .Values.additionalVolumeMounts }}
+            {{ toYaml .Values.additionalVolumeMounts | nindent 12 }}
+          {{- end }}
+          {{- end }}
+      {{- if or .Values.gitAuth.credentials.enabled .Values.gitAuth.ssh.enabled .Values.additionalVolumes }}
       volumes:
       {{- if or .Values.gitAuth.credentials.enabled .Values.gitAuth.ssh.enabled }}
         - name: git-auth
@@ -90,6 +96,10 @@ spec:
                       path: ssh-key
                       mode: 256
               {{- end }}
+      {{- end }}
+      {{- if .Values.additionalVolumes }}
+        {{ toYaml .Values.additionalVolumes | nindent 8 }}
+      {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
       nodeSelector:
