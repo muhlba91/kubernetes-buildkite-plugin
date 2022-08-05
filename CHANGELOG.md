@@ -1,6 +1,20 @@
 # Changelog
 
 
+### [1.0.8](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/v1.0.7...v1.0.8) (2022-08-05)
+
+
+### Bug Fixes
+
+* add additional volumes to agent chart ([15536f9](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/15536f900f8a925a72618adad4c1903e0def10e4))
+* fix agent deployment ([11eb81a](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/11eb81a5eac9c8a2774d813ffee0e6d1ec522a68))
+* fix agent volume modes ([e5ff65a](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/e5ff65a45840b8e982b4ca768227562050bc5bc3))
+* fix bootstrap command ([71bba22](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/71bba22d463c53032b8383db63fc681542d7ba06))
+* fix buildscaler deployment env ([1c8cce7](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/1c8cce71eeeae7860f6b961785af8229c6cf1b32))
+* fix buildscaler duplicated rbac rolebinding ([ca404ee](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/ca404ee29eb75202a5c23a24e891f9b8b72f731e))
+* fix rbac for agent chart ([6ec8c14](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/6ec8c144629257455564dc283bff3c32c7b831ac))
+* fix rbac for buildscaler chart ([a989866](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/a989866f1f414df428a1d2f45b12370ca8c85a03))
+
 ### [1.0.7](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/v1.0.6...v1.0.7) (2022-08-05)
 
 
