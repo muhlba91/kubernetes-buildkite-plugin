@@ -1,6 +1,15 @@
 # Changelog
 
 
+### [1.0.6](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/v1.0.5...v1.0.6) (2022-08-05)
+
+
+### Bug Fixes
+
+* fix hooks to retrieve the job ([8eea305](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/8eea305fd1968a3ae57fc7c1d14656ab50909a03))
+* remove printing commands on startup of the container ([ffd36f1](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/ffd36f11464d1aff24bc49921098adbd548d2617))
+* update chart app version ([a9e10e1](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/a9e10e1687e17f87509a319eacef6b4f785217ca))
+
 ### [1.0.5](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/v1.0.4...v1.0.5) (2022-08-04)
 
 
