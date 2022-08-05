@@ -1,6 +1,13 @@
 # Changelog
 
 
+### [1.0.3](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/chart/buildscaler/v1.0.2...chart/buildscaler/v1.0.3) (2022-08-05)
+
+
+### Bug Fixes
+
+* fix rbac for buildscaler chart ([a989866](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/a989866f1f414df428a1d2f45b12370ca8c85a03))
+
 ### [1.0.2](https://github.com/muhlba91/buildkite-plugin-kubernetes/compare/chart/buildscaler/v1.0.1...chart/buildscaler/v1.0.2) (2022-08-04)
 
 
