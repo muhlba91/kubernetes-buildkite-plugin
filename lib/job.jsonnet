@@ -69,8 +69,8 @@ function(jobName, agentEnv={}, stepEnvFile='', patchFunc=identity) patchFunc({
     ] +
     [
       {
-        name: 'BUILDKITE_BOOTSTRAP_PHASES',
-        value: 'checkout,command',
+        name: 'BUILDKITE_PLUGIN_KUBERNETES_JOB',
+        value: 'true',
       },
     ] +
     [

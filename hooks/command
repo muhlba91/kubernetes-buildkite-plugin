@@ -1,6 +1,11 @@
 #!/bin/bash
 set -eo pipefail
 
+if [[ -n "${BUILDKITE_PLUGIN_KUBERNETES_JOB}" ]]; then
+  echo "Running as init-container. Disabling command."
+  exit 0
+fi
+
 if [[ $OSTYPE == darwin* ]]; then
   echo "MacOS is not supported yet. Running Buildkite supplied command..."
   exec /bin/bash -c "${BUILDKITE_COMMAND}"
