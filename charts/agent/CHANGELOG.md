@@ -1,6 +1,13 @@
 # Changelog
 
 
+### [1.0.8](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/chart/agent/v1.0.7...chart/agent/v1.0.8) (2022-08-05)
+
+
+### Bug Fixes
+
+* fix agent volume modes ([e5ff65a](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/e5ff65a45840b8e982b4ca768227562050bc5bc3))
+
 ### [1.0.7](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/chart/agent/v1.0.6...chart/agent/v1.0.7) (2022-08-05)
 
 
