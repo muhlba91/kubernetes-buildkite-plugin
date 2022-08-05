@@ -1,6 +1,13 @@
 # Changelog
 
 
+### [1.0.4](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/chart/buildscaler/v1.0.3...chart/buildscaler/v1.0.4) (2022-08-05)
+
+
+### Bug Fixes
+
+* fix buildscaler deployment env ([1c8cce7](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/1c8cce71eeeae7860f6b961785af8229c6cf1b32))
+
 ### [1.0.3](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/chart/buildscaler/v1.0.2...chart/buildscaler/v1.0.3) (2022-08-05)
 
 
