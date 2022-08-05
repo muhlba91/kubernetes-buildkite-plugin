@@ -1,6 +1,13 @@
 # Changelog
 
 
+### [1.0.6](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/chart/agent/v1.0.5...chart/agent/v1.0.6) (2022-08-05)
+
+
+### Bug Fixes
+
+* fix rbac for agent chart ([6ec8c14](https://github.com/muhlba91/kubernetes-buildkite-plugin/commit/6ec8c144629257455564dc283bff3c32c7b831ac))
+
 ### [1.0.5](https://github.com/muhlba91/kubernetes-buildkite-plugin/compare/chart/agent/v1.0.4...chart/agent/v1.0.5) (2022-08-05)
 
 
