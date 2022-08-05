@@ -80,7 +80,7 @@ spec:
                   items:
                     - key: {{ default "git-credentials" .Values.gitAuth.credentials.existingSecretKey }}
                       path: git-credentials
-                  mode: 256
+                      mode: 256
               {{- end }}
               {{- if .Values.gitAuth.ssh.enabled }}
               - secret:
@@ -88,7 +88,7 @@ spec:
                   items:
                     - key: {{ default "ssh-key" .Values.gitAuth.ssh.existingSecretKey }}
                       path: ssh-key
-                  mode: 256
+                      mode: 256
               {{- end }}
       {{- end }}
       {{- with .Values.nodeSelector }}
